@@ -1,30 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlcpy.c                                       :+:      :+:    :+:   */
+/*   pipex_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gabd-el- <gabd-el-@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/15 12:41:57 by gabd-el-          #+#    #+#             */
-/*   Updated: 2023/01/16 14:39:47 by gabd-el-         ###   ########.fr       */
+/*   Created: 2023/06/08 18:33:10 by gabd-el-          #+#    #+#             */
+/*   Updated: 2023/06/12 19:58:17 by gabd-el-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "include/pipex.h"
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
+int	check_quotes(char *cmd)
 {
-	size_t	x;
+	int	count;
+	int	i;
 
-	x = 0;
-	if (dstsize != 0)
+	i = 0;
+	count = 0;
+	while (cmd[i])
 	{
-		while (x < dstsize - 1 && src[x] != '\0')
-		{
-			dst[x] = src[x];
-			x++;
-		}
-		dst[x] = '\0';
+		if (cmd[i] == 34 || cmd[i] == 39)
+			count++;
+		i++;
 	}
-	return (ft_strlen((char *)src));
+	if (count % 2 == 0)
+		return (1);
+	return (0);
 }
