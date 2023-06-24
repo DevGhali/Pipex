@@ -47,12 +47,41 @@ Now here is a visual breakdown of the command and an example for every element o
 -  [The dup2() function](https://www.ibm.com/docs/en/i/7.3?topic=ssw_ibm_i_73/apis/dup2.html) - basically it duplicates a file discriptor to another for instance : dup2(int fd1,int fd2) closes fd2 and duplicates the value of fd2 to fd1 so that fd1 becomes fd2.
 
 
+## BONUS Part ✚
+The bonus part brings 2 major improvements to the project, 1. that it can handle multiple commands and not be limited to only 2 commands like in the mandatory part, multiple commands means multiple pipes.
+> as follows :
+```bash
+./pipex file1 cmd1 cmd2 cmd3 cmd4 ... cmdn file2
+```
+> Should behave like (how the original command would look like in the ordinary shell) :
+```bash
+< file1 cmd1 | cmd2 | cmd3 | cmd4 ... cmdn > file2
+```
+
+
+2. Support << and >> in other words ["heredoc"](https://linuxize.com/post/bash-heredoc/), im not gonna explain heredoc in details you can give it a look :)
+> as follows :
+```bash
+./pipex heredoc LIMITER cmd1 cmd2 file
+```
+> Should behave like (how the original command would look like in the ordinary shell) :
+```bash
+cmd1 << LIMITER | cmd1 >> file
+```
+
 ## Usage
 > compile using the Makefile :
 
 ```bash
 make all
 ```
+
+> for bonus :
+
+```bash
+make bonus
+```
+
 > create the infile/outfile :
 ```bash
 make files
