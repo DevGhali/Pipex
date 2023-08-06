@@ -57,14 +57,21 @@ typedef struct s_pipex
 /*
 **  Functions
 */
+// pipex_utils.c
+void	perror_exit1(t_pipex *pipee, char *error);
+void	perror_exit0(t_pipex *pipee, char *error);
+void	free_arr(char **arr);
+void	first_child(t_pipex *pipee, char **argv, char **envp);
+void	second_child(t_pipex *pipee, char **argv, char **envp);
 
-void	perror11(char *error);
-void	perror00(char *error);
-void	pipex(t_pipex pipee, char **argv, char **envp);
-void	child(t_pipex pipee, char **argv, char **envp);
-void	parent(t_pipex pipee, char **argv, char **envp);
-void	exec(char *argv, char **envp);
+
+// pipex.c
+void	pipex(t_pipex *pipee, char **argv, char **envp);
+
+// exec.c
+void	exec(t_pipex *pipee, char *cmd, char **envp);
 char	*find_cmd_path(char *cmd, char **envp, t_pipex *pipee);
-void	freee(char **str);
+
+// pipex_utils2.c
 int		check_quotes(char *cmd);
 #endif

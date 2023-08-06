@@ -12,43 +12,55 @@
 
 #include "include/pipex.h"
 
-void	freee(char **str)
+void	free_arr(char **arr)
 {
 	size_t	i;
 
 	i = 0;
-	while (str[i])
+	if (arr[i])
 	{
-		free(str[i]);
-		i++;
+		while (arr[i])
+		{
+			if (arr[i] != NULL)
+				free(arr[i]);
+			i++;
+		}
 	}
-	free(str);
+	free(arr);
 }
 
-void	child(t_pipex pipee, char **argv, char **envp)
+void	first_child(t_pipex *pipee, char **argv, char **envp)
 {
-	dup2(pipee.fds[1], STDOUT_FILENO);
-	dup2(pipee.infile, STDIN_FILENO);
-	close(pipee.fds[0]);
-	exec(argv[2], envp);
+	dup2(pipee->fds[1], STDOUT_FILENO);
+	dup2(pipee->infile, STDIN_FILENO);
+	close(pipee->fds[0]);
+	exec(pipee, argv[2], envp);
 }
 
-void	parent(t_pipex pipee, char **argv, char **envp)
+void	second_child(t_pipex *pipee, char **argv, char **envp)
 {
-	dup2(pipee.fds[0], STDIN_FILENO);
-	dup2(pipee.outfile, STDOUT_FILENO);
-	close(pipee.fds[1]);
-	exec(argv[3], envp);
+	dup2(pipee->fds[0], STDIN_FILENO);
+	dup2(pipee->outfile, STDOUT_FILENO);
+	close(pipee->fds[1]);
+	exec(pipee, argv[3], envp);
 }
 
-void	perror11(char *error)
+void	perror_exit1(t_pipex *pipee, char *error)
 {
+	if (pipee->outfile >= 0)
+		close(pipee->outfile);
+	if (pipee->infile >= 0)
+		close(pipee->infile);
 	perror(error);
 	exit(1);
 }
 
-void	perror00(char *error)
+void	perror_exit0(t_pipex *pipee, char *error)
 {
+	if (pipee->outfile >= 0)
+		close(pipee->outfile);
+	if (pipee->infile >= 0)
+		close(pipee->infile);
 	write(STDERR_FILENO, "pipex: ", 7);
 	perror(error);
 	exit(0);

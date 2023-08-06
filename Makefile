@@ -31,13 +31,13 @@ RM = rm -f
 all: $(NAME)
 
 %.o: %.c
-	$(GCC) -c $(CFLAGS) $< -o ${<:.c=.o}
+	$(GCC) -g -c $(CFLAGS) $< -o ${<:.c=.o}
 
 $(NAME): $(OBJS)
 	${RM} $(BONUS_OBJS)
 	$(LIBFT_MAKE)
 	$(LIBFT_CP)
-	$(GCC) $(FLAGS) -o $(NAME) $(OBJS) libft.a
+	$(GCC) $(FLAGS) -g -o $(NAME) $(OBJS) libft.a
 
 bonus: ${BONUS_OBJS}
 	${RM} $(OBJS)
@@ -45,7 +45,7 @@ bonus: ${BONUS_OBJS}
 	$(LIBFT_CP)
 	$(GNL_MAKE)
 	$(GNL_CP)
-	$(GCC) $(FLAGS) -o $(NAME) $(BONUS_OBJS) libft.a gnl.a
+	$(GCC) $(FLAGS) -g -o $(NAME) $(BONUS_OBJS) libft.a gnl.a
 
 clean:
 	$(RM) $(OBJS)

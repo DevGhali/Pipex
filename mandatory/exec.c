@@ -12,7 +12,7 @@
 
 #include "include/pipex.h"
 
-char	helper_quote(char quote, char ret, int *i)
+static char	helper_quote(char quote, char ret, int *i)
 {
 	(*i)++;
 	if (quote == '\0')
@@ -20,7 +20,7 @@ char	helper_quote(char quote, char ret, int *i)
 	return ('\0');
 }
 
-int	decider(char c, char quote)
+static int	decider(char c, char quote)
 {
 	if (c == '\'' && quote != '\"')
 		return (1);
@@ -31,33 +31,33 @@ int	decider(char c, char quote)
 	return (2);
 }
 
-char	**split_string(t_pipex pipee, int i, int j, int k)
+static char	**split_string(t_pipex *pipee, int i, int j, int k)
 {
-	while (pipee.cmd[i] != '\0')
+	while (pipee->cmd[i] != '\0')
 	{
-		if (decider(pipee.cmd[i], pipee.quote) == 1)
+		if (decider(pipee->cmd[i], pipee->quote) == 1)
 		{
-			pipee.quote = helper_quote(pipee.quote, pipee.cmd[i], &i);
+			pipee->quote = helper_quote(pipee->quote, pipee->cmd[i], &i);
 			continue ;
 		}
-		if (decider(pipee.cmd[i], pipee.quote) == 0)
+		if (decider(pipee->cmd[i], pipee->quote) == 0)
 		{
 			if (j > 0)
 			{
-				pipee.result[k][j] = '\0';
+				pipee->result[k][j] = '\0';
 				k++;
-				pipee.result[k] = malloc(ft_strlen(pipee.cmd) * sizeof(char));
+				pipee->result[k] = malloc(ft_strlen(pipee->cmd) * sizeof(char));
 				j = 0;
 			}
 		}
 		else
-			pipee.result[k][j++] = pipee.cmd[i];
+			pipee->result[k][j++] = pipee->cmd[i];
 		i++;
 	}
 	if (j > 0)
-		pipee.result[k++][j] = '\0';
-	pipee.result[k] = NULL;
-	return (pipee.result);
+		pipee->result[k++][j] = '\0';
+	pipee->result[k] = NULL;
+	return (pipee->result);
 }
 
 char	*find_cmd_path(char *cmd, char **envp, t_pipex *pipee)
@@ -85,29 +85,27 @@ char	*find_cmd_path(char *cmd, char **envp, t_pipex *pipee)
 		free(pipee->cmd_path);
 		i++;
 	}
-	freee(pipee->splitted_paths);
+	free_arr(pipee->splitted_paths);
 	return (NULL);
 }
 
-void	exec(char *cmd, char **envp)
+void	exec(t_pipex *pipee, char *cmd, char **envp)
 {
-	t_pipex	pipee;
-
 	if (!check_quotes(cmd))
-		perror11("command not found");
-	pipee.cmd = cmd;
-	pipee.quote = '\0';
-	pipee.result = malloc((ft_strlen(pipee.cmd) / 2 + 1) * sizeof(char *));
-	pipee.result[0] = (char *)malloc(ft_strlen(pipee.cmd) * sizeof(char));
-	pipee.cmd_splitted = split_string(pipee, 0, 0, 0);
-	pipee.cmd_path = find_cmd_path(pipee.cmd_splitted[0], envp, &pipee);
-	if (!pipee.cmd_path)
+		perror_exit1(pipee, "command not found");
+	pipee->cmd = cmd;
+	pipee->quote = '\0';
+	pipee->result = malloc((ft_strlen(pipee->cmd) / 2 + 1) * sizeof(char *));
+	pipee->result[0] = (char *)malloc(ft_strlen(pipee->cmd) * sizeof(char));
+	pipee->cmd_splitted = split_string(pipee, 0, 0, 0);
+	pipee->cmd_path = find_cmd_path(pipee->cmd_splitted[0], envp, pipee);
+	if (!pipee->cmd_path)
 	{
 		write(STDERR_FILENO, ERR_MSG, 7);
-		ft_putstr_fd(pipee.cmd_splitted[0], STDERR_FILENO);
+		ft_putstr_fd(pipee->cmd_splitted[0], STDERR_FILENO);
 		ft_putstr_fd(": command not found\n", STDERR_FILENO);
 		exit(127);
 	}
-	if (execve(pipee.cmd_path, pipee.cmd_splitted, envp) < 0)
-		perror11(ERR_EXECVE);
+	if (execve(pipee->cmd_path, pipee->cmd_splitted, envp) < 0)
+		perror_exit1(pipee, ERR_EXECVE);
 }

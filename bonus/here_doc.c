@@ -43,7 +43,7 @@ void	here_doc(char *limiter, t_pipex *rohr)
 
 void	openn_heredoc(t_pipex *rohr, char **argv, int argc)
 {
-	rohr->outfile = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0664);
+	rohr->outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND , 0664);
 	if (rohr->outfile < 0)
 		perror0(argv[argc - 1], rohr->outfile);
 	dup2(rohr->infile, STDIN_FILENO);
