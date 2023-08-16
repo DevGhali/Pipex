@@ -16,7 +16,10 @@ void	pipex(t_pipex *pipee, char **argv, char **envp)
 {
 	if (pipe(pipee->fds) < 0)
 		perror_exit1(pipee, ERR_PIPE);
-	pipee->pid = fork();
+    initialize_struct(pipee, argv[3], envp);
+    if (!pipee->cmd_path)
+        exit(127);
+    pipee->pid = fork();
 	if (pipee->pid == -1)
 		perror_exit1(pipee, ERR_FORK);
 	if (pipee->pid == 0)
@@ -26,7 +29,7 @@ void	pipex(t_pipex *pipee, char **argv, char **envp)
 		waitpid(pipee->pid, 0, 0);
 		pipee->pid2 = fork();
 		if (pipee->pid2 == 0)
-			second_child(pipee, argv, envp);
+            second_child(pipee, argv, envp);
 	}
 }
 

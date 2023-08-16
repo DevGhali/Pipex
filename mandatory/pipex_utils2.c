@@ -29,3 +29,22 @@ int	check_quotes(char *cmd)
 		return (1);
 	return (0);
 }
+
+char	helper_quote(char quote, char ret, int *i)
+{
+    (*i)++;
+    if (quote == '\0')
+        return (ret);
+    return ('\0');
+}
+
+int	decider(char c, char quote)
+{
+    if (c == '\'' && quote != '\"')
+        return (1);
+    if (c == '\"' && quote != '\'')
+        return (1);
+    if (quote == '\0' && (c == ' ' || c == '\t'))
+        return (0);
+    return (2);
+}

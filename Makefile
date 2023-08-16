@@ -38,6 +38,7 @@ $(NAME): $(OBJS)
 	$(LIBFT_MAKE)
 	$(LIBFT_CP)
 	$(GCC) $(FLAGS) -g -o $(NAME) $(OBJS) libft.a
+	make clean
 
 bonus: ${BONUS_OBJS}
 	${RM} $(OBJS)
@@ -48,8 +49,9 @@ bonus: ${BONUS_OBJS}
 	$(GCC) $(FLAGS) -g -o $(NAME) $(BONUS_OBJS) libft.a gnl.a
 
 clean:
-	$(RM) $(OBJS)
-	$(RM) $(BONUS_OBJS)
+	$(RM) $(OBJS) $(BONUS_OBJS) libft.a gnl.a
+	make fclean -C libft
+	make fclean -C get_next_line
 
 fclean:
 	$(RM) $(NAME)

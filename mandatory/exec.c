@@ -12,26 +12,50 @@
 
 #include "include/pipex.h"
 
-static char	helper_quote(char quote, char ret, int *i)
+int count_words(t_pipex *pipee, int index, int j, int count)
 {
-	(*i)++;
-	if (quote == '\0')
-		return (ret);
-	return ('\0');
+    while (pipee->cmd[index] != '\0')
+    {
+        if (decider(pipee->cmd[index], pipee->quote) == 1)
+        {
+            pipee->quote = helper_quote(pipee->quote, pipee->cmd[index], &index);
+            continue ;
+        }
+        if (decider(pipee->cmd[index], pipee->quote) == 0)
+        {
+            if (j > 0)
+            {
+                count++;
+                j = 0;
+            }
+        }
+        else
+            j++;
+        index++;
+    }
+    return (count);
 }
 
-static int	decider(char c, char quote)
+void initialize_struct(t_pipex *pipee, char *cmd, char **envp)
 {
-	if (c == '\'' && quote != '\"')
-		return (1);
-	if (c == '\"' && quote != '\'')
-		return (1);
-	if (quote == '\0' && (c == ' ' || c == '\t'))
-		return (0);
-	return (2);
+    pipee->cmd = cmd;
+    pipee->quote = '\0';
+    pipee->word_count = count_words(pipee, 0, 0, 0);
+    pipee->result = malloc(pipee->word_count * sizeof(char *));
+    pipee->result[0] = (char *)malloc(ft_strlen(cmd) * sizeof(char));
+    pipee->cmd_splitted = split_string(pipee, 0, 0, 0);
+    pipee->cmd_path = find_cmd_path(pipee->cmd_splitted[0], envp, pipee);
+    if (!pipee->cmd_path)
+    {
+        write(STDERR_FILENO, ERR_MSG, 7);
+        ft_putstr_fd(pipee->cmd, STDERR_FILENO);
+        ft_putstr_fd(": command not found\n", STDERR_FILENO);
+        if (pipee->cmd_splitted != NULL)
+            free_arr(pipee->cmd_splitted);
+    }
 }
 
-static char	**split_string(t_pipex *pipee, int i, int j, int k)
+char	**split_string(t_pipex *pipee, int i, int j, int k)
 {
 	while (pipee->cmd[i] != '\0')
 	{
@@ -63,8 +87,9 @@ static char	**split_string(t_pipex *pipee, int i, int j, int k)
 char	*find_cmd_path(char *cmd, char **envp, t_pipex *pipee)
 {
 	size_t	i;
+    char *tmp;
 
-	if (access(cmd, F_OK) == 0)
+	if (access(cmd, F_OK) == 0 || cmd == NULL)
 		return (cmd);
 	i = 0;
 	if (envp[i] == NULL)
@@ -73,7 +98,7 @@ char	*find_cmd_path(char *cmd, char **envp, t_pipex *pipee)
 	{
 		while (ft_strncmp(envp[i], "PATH=", 5) != 0)
 			i++;
-		pipee->splitted_paths = ft_split(envp[i] + 5, ':');
+        pipee->splitted_paths = ft_split(envp[i] + 5, ':');
 	}
 	i = 0;
 	while (pipee->splitted_paths[i])
@@ -93,19 +118,9 @@ void	exec(t_pipex *pipee, char *cmd, char **envp)
 {
 	if (!check_quotes(cmd))
 		perror_exit1(pipee, "command not found");
-	pipee->cmd = cmd;
-	pipee->quote = '\0';
-	pipee->result = malloc((ft_strlen(pipee->cmd) / 2 + 1) * sizeof(char *));
-	pipee->result[0] = (char *)malloc(ft_strlen(pipee->cmd) * sizeof(char));
-	pipee->cmd_splitted = split_string(pipee, 0, 0, 0);
-	pipee->cmd_path = find_cmd_path(pipee->cmd_splitted[0], envp, pipee);
-	if (!pipee->cmd_path)
-	{
-		write(STDERR_FILENO, ERR_MSG, 7);
-		ft_putstr_fd(pipee->cmd_splitted[0], STDERR_FILENO);
-		ft_putstr_fd(": command not found\n", STDERR_FILENO);
-		exit(127);
-	}
-	if (execve(pipee->cmd_path, pipee->cmd_splitted, envp) < 0)
-		perror_exit1(pipee, ERR_EXECVE);
+    if (ft_strncmp(cmd, " ", ft_strlen(cmd)) != 0)
+    {
+        initialize_struct(pipee, cmd, envp);
+        execve(pipee->cmd_path, pipee->cmd_splitted, envp);
+    }
 }
