@@ -17,7 +17,7 @@ FLAGS = -Wall -Wextra -Werror
 SRCS = mandatory/pipex.c mandatory/pipex_utils.c mandatory/exec.c mandatory/pipex_utils2.c
 OBJS = $(SRCS:.c=.o)
 
-BONUS_SRCS	= bonus/pipex_bonus.c bonus/pipex_bonus_utils.c bonus/pipex_bonus_utils2.c bonus/here_doc.c
+BONUS_SRCS	= bonus/pipex_bonus.c bonus/pipex_bonus_utils.c bonus/pipex_bonus_utils2.c bonus/here_doc.c bonus/exec_bonus.c
 BONUS_OBJS	= $(BONUS_SRCS:.c=.o)
 
 LIBFT_MAKE = make all -C libft
@@ -47,6 +47,7 @@ bonus: ${BONUS_OBJS}
 	$(GNL_MAKE)
 	$(GNL_CP)
 	$(GCC) $(FLAGS) -g -o $(NAME) $(BONUS_OBJS) libft.a gnl.a
+	make clean
 
 clean:
 	$(RM) $(OBJS) $(BONUS_OBJS) libft.a gnl.a

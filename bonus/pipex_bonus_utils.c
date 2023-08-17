@@ -12,60 +12,35 @@
 
 #include "include/pipex_bonus.h"
 
-void	openn(t_pipex *rohr, char **argv, int argc)
-{
-	rohr->outfile = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0664);
-	if (rohr->outfile < 0)
-		perror0(argv[argc - 1], -1);
-	rohr->infile = open(argv[1], O_RDONLY);
-	if (rohr->infile < 0)
-		perror0(argv[1], rohr->outfile);
-	dup2(rohr->infile, STDIN_FILENO);
-}
-
-void	freee(char **str)
+void	free_arr(char **arr)
 {
 	size_t	i;
 
 	i = 0;
-	while (str[i] != NULL)
+	while (arr[i] != NULL)
 	{
-		if (str[i])
-			free(str[i]);
+		if (arr[i])
+			free(arr[i]);
 		i++;
 	}
-	free(str);
+	free(arr);
 }
 
-void	perror0(char *msg, int fd)
+void	perror_exit1(t_pipex *pipee, char *error)
 {
-	if (fd != -1)
-		write(fd, "       0\n", 9);
-	write(STDERR_FILENO, "pipex: ", 7);
-	perror(msg);
-	exit(0);
-}
-
-void	perror1(char *msg)
-{
-	perror(msg);
+	perror(error);
 	exit(1);
 }
 
-int	check_quotes(char *cmd)
+void	perror_exit0(t_pipex *pipee, char *error, int fd)
 {
-	int	count;
-	int	i;
-
-	i = 0;
-	count = 0;
-	while (cmd[i])
-	{
-		if (cmd[i] == 34 || cmd[i] == 39)
-			count++;
-		i++;
-	}
-	if (count % 2 == 0)
-		return (1);
-	return (0);
+    if (fd != -1)
+        write(fd, "       0\n", 9);
+    if (pipee->outfile >= 0)
+        close(pipee->outfile);
+    if (pipee->infile >= 0)
+        close(pipee->infile);
+    write(STDERR_FILENO, "pipex: ", 7);
+    perror(error);
+    exit(0);
 }

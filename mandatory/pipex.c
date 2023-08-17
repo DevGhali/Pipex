@@ -18,7 +18,10 @@ void	pipex(t_pipex *pipee, char **argv, char **envp)
 		perror_exit1(pipee, ERR_PIPE);
     initialize_struct(pipee, argv[3], envp);
     if (!pipee->cmd_path)
+    {
+        initialize_struct(pipee, argv[2], envp);
         exit(127);
+    }
     pipee->pid = fork();
 	if (pipee->pid == -1)
 		perror_exit1(pipee, ERR_FORK);
@@ -40,12 +43,7 @@ static	void	open_files(t_pipex *pipee, char **argv)
 		perror_exit0(pipee, argv[4]);
 	pipee->infile = open(argv[1], O_RDONLY);
 	if (pipee->infile < 0)
-	{
-		if (pipee->outfile != -1)
-			write(pipee->outfile, "       0\n", 9);
-		close(pipee->outfile);
 		perror_exit0(pipee, argv[1]);
-	}
 }
 
 int	main(int argc, char **argv, char **envp)

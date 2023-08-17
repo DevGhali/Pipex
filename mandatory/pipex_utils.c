@@ -57,6 +57,8 @@ void	perror_exit1(t_pipex *pipee, char *error)
 
 void	perror_exit0(t_pipex *pipee, char *error)
 {
+    if (pipee->outfile != -1)
+        write(pipee->outfile, "       0\n", 9);
 	if (pipee->outfile >= 0)
 		close(pipee->outfile);
 	if (pipee->infile >= 0)

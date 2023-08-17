@@ -21,7 +21,7 @@
 # include <fcntl.h>
 # include <unistd.h>
 
-# define ERR_ARG "Number of args is wrong"
+# define ERR_ARG "Bad Number of Arguments"
 # define ERR_PIPE "Error while creating a pipe"
 # define ERR_FORK "Error while forking"
 # define ERR_DUP "Error while duplicating"
@@ -33,28 +33,41 @@
 
 typedef struct s_pipex
 {
-	pid_t	pid;
-	int		ends[2];
-	int		infile;
-	int		outfile;
-	int		cmd_index;
+	int		fds[2];
+    pid_t	pid;
+    int		infile;
+    int		outfile;
+    int		cmd_index;
 	char	**splitted_paths;
 	char	*cmd_path;
 	char	**cmd_splitted;
 	char	quote;
 	char	*cmd;
 	char	**result;
-	int		x;
+    int     word_count;
 }		t_pipex;
 
-void	perror0(char *msg, int fd);
-void	perror1(char *msg);
-void	freee(char **str);
-void	openn(t_pipex *rohr, char **argv, int argc);
-void	openn_heredoc(t_pipex *rohr, char **argv, int argc);
-void	here_doc(char *limiter, t_pipex *rohr);
-char	*find_cmd_path(char *cmd, char **envp, t_pipex *rohr);
-void	exec(char *cmd, char **envp);
+//pipex_bonus_utils.c
+void	perror_exit0(t_pipex *pipee, char *error, int fd);
+void	perror_exit1(t_pipex *pipee, char *error);
+void	free_arr(char **arr);
+
+//pipex_bonus_utils2.c
 int		check_quotes(char *cmd);
-void	pipex(t_pipex rohr, char **argv, char **envp);
+char	helper_quote(char quote, char ret, int *i);
+int     decider(char c, char quote);
+
+//pipex_bonus.c
+void	pipex(t_pipex *pipee, char **argv, int argc, char **envp);
+
+//exec_bonus.c
+void	exec_bonus(t_pipex *pipee, char *cmd, char **envp);
+char	**split_string(t_pipex *pipee, int i, int j, int k);
+char	*find_cmd_path(char *cmd, char **envp, t_pipex *pipee);
+int     count_words(t_pipex *pipee, int index, int j, int count);
+void    initialize_struct(t_pipex *pipee, char *cmd, char **envp, int flag);
+
+//here_doc.c
+void	here_doc(char *limiter, t_pipex *pipee, char **argv, int argc);
+
 #endif
